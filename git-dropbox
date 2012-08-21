@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+if [[ -z "$1" ]]; then
+    COMMAND="st"
+else
+    COMMAND=$1;
+fi
+
+DB_PATH=`git config --global dropbox.path`
+if [[ -z "$DB_PATH" ]]; then
+    echo "Please set your dropbox git folder path using 'git config --global dropbox.path <path>'"
+    exit
+fi
+
+if [[ ! -d ".git" ]]; then
+    echo "Not a git root directory, dropbox will only work in git root directory."
+    exit
+fi
+
+# Make an alias
+if [[ -z "$(git alias db)" ]]; then
+    git alias db dropbox
+    echo "An alias for dropbox has been created. You can use 'git db' instead."
+fi
+
+IS_ENABLED=`git config --local dropbox.enabled`
+function exit_if_empty {
+    if [[ -z "$IS_ENABLED" ]]; then
+        echo "Dropbox support is not enabled."
+        echo "Use 'git dropbox init' to make this repo dropbox enabled."
+        exit
+    fi
+}
+
+case $COMMAND in
+    "init" )
+        REPO_PATH=$DB_PATH/$(basename `pwd`).git
+        if [[ ! -d $REPO_PATH ]]; then
+            mkdir -p $REPO_PATH
+            git init --bare $REPO_PATH
+            git remote add dropbox file://$REPO_PATH
+            git config --local dropbox.enabled true
+        else
+            echo "fatal: Directory [$REPO_PATH] already exist."
+        fi
+        ;;
+    "status" | "st" )
+        exit_if_empty
+        echo "Dropbox support is enabled."
+        ;;
+    "push" )
+        exit_if_empty
+        git push --mirror dropbox
+        ;;
+    * ) echo "Invalid Command";
+        ;;
+esac
