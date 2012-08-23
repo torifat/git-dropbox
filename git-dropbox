@@ -12,8 +12,10 @@ if [[ -z "$DB_PATH" ]]; then
     exit
 fi
 
-if [[ ! -d ".git" ]]; then
-    echo "Not a git root directory, dropbox will only work in git root directory."
+# Check if its a git folder or not
+TOP_LEVEL=$(git rev-parse --show-toplevel 2> /dev/null)
+if [[ -z "$TOP_LEVEL" ]] && [[ ! -d "$TOP_LEVEL/.git" ]]; then
+    echo "fatal: Dropbox will only work with existing git repositories."
     exit
 fi
 
@@ -34,7 +36,7 @@ function exit_if_empty {
 
 case $COMMAND in
     "init" )
-        REPO_PATH=$DB_PATH/$(basename `pwd`).git
+        REPO_PATH=$DB_PATH/$(basename $TOP_LEVEL).git
         if [[ ! -d $REPO_PATH ]]; then
             mkdir -p $REPO_PATH
             git init --bare $REPO_PATH

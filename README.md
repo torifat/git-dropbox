@@ -24,14 +24,13 @@ For example I have my dropbox installed in `~/Dropbox`. So, I've created a folde
 $ git config --global dropbox.path ~/Dropbox/Git
 ```
 
-Now, to make a git repo dropbox enabled, do the following form the root folder of that repo -
+Now, to enable dropbox support for any git repository, do the following -
 
 ```bash
 $ git dropbox init
 ```
 
 Now, to push your changes to dropbox -
-
 
 ```bash
 $ git dropbox push
