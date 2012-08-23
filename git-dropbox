@@ -36,6 +36,11 @@ function exit_if_empty {
 
 case $COMMAND in
     "init" )
+        if [[ ! -z "$IS_ENABLED" ]]; then
+            echo "Dropbox support is already enabled."
+            exit
+        fi
+
         REPO_PATH=$DB_PATH/$(basename $TOP_LEVEL).git
         if [[ ! -d $REPO_PATH ]]; then
             mkdir -p $REPO_PATH
